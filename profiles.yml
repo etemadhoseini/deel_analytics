@@ -1,0 +1,15 @@
+deel_analytics:
+  target: prod
+  outputs:
+    prod:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      role: "{{ env_var('SNOWFLAKE_ROLE') }}"
+      database: "{{ env_var('SNOWFLAKE_DATABASE') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE') }}"
+      schema: "{{ env_var('SNOWFLAKE_SCHEMA_CURATED') }}{{ env_var('SCHEMA_SUFFIX','_DEV') }}"
+      client_session_keep_alive: false
+      threads: 4
+      query_tag: "{{ env_var('DBT_QUERY_TAG', 'deel_analytics') }}"

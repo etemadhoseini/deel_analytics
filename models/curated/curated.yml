@@ -1,0 +1,25 @@
+version: 2
+
+models:
+  - name: dim_organizations
+    description: "Organization dimension with key dates and metadata."
+    columns:
+      - name: ORGANIZATION_ID
+        data_tests: [not_null, unique]
+      - name: LEGAL_ENTITY_COUNTRY_CODE
+        data_tests: [not_null]
+
+  - name: fact_organizations_payment
+    description: >
+      Daily organization-level payments in USD (statuses: CREDITED, REFUNDED, PAID).
+      USD is derived via COALESCE(PAYMENT_AMOUNT/FX_RATE_PAYMENT, AMOUNT/FX_RATE).
+    columns:
+      - name: ORGANIZATION_ID
+        data_tests: [not_null]
+      - name: DATE
+        data_tests: [not_null]
+      - name: PAYMENT_AMOUNT_USD
+        data_tests: [not_null]
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [ORGANIZATION_ID, DATE]

@@ -1,0 +1,9 @@
+.git
+__pycache__/
+.airflow/
+logs/
+node_modules/
+dbt_packages/
+target/
+.env
+.env.*

@@ -1,0 +1,79 @@
+# docker-compose.yml (relevant parts)
+services:
+  postgres:
+    image: postgres:14
+    env_file: [.env]
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-airflow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-airflow}
+      POSTGRES_DB: ${POSTGRES_DB:-airflow}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-airflow} -d ${POSTGRES_DB:-airflow}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  airflow-init:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: deel-airflow:2.9.3-dbt
+    user: "50000:0"
+    env_file: [.env]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: ${AIRFLOW__CORE__LOAD_EXAMPLES:-False}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: ${AIRFLOW__DATABASE__SQL_ALCHEMY_CONN}
+      # IMPORTANT: do not install at runtime
+      _PIP_ADDITIONAL_REQUIREMENTS: ""
+    volumes:
+      - ./airflow:/opt/airflow
+      - ./:/opt/project
+    entrypoint: ["/bin/bash","-lc"]
+    command: ["bash /opt/airflow/bootstrap/bootstrap.sh"]
+    restart: "no"
+
+  airflow-webserver:
+    image: deel-airflow:2.9.3-dbt
+    user: "50000:0"
+    env_file: [.env]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: ${AIRFLOW__CORE__LOAD_EXAMPLES:-False}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: ${AIRFLOW__DATABASE__SQL_ALCHEMY_CONN}
+      _PIP_ADDITIONAL_REQUIREMENTS: ""
+    volumes:
+      - ./airflow:/opt/airflow
+      - ./:/opt/project
+    ports:
+      - "8080:8080"
+    command: ["webserver"]
+    restart: unless-stopped
+
+  airflow-scheduler:
+    image: deel-airflow:2.9.3-dbt
+    user: "50000:0"
+    env_file: [.env]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: ${AIRFLOW__DATABASE__SQL_ALCHEMY_CONN}
+      _PIP_ADDITIONAL_REQUIREMENTS: ""
+    volumes:
+      - ./airflow:/opt/airflow
+      - ./:/opt/project
+    command: ["scheduler"]
+    restart: unless-stopped
+
+volumes:
+  postgres-data:

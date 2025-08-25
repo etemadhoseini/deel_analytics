@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: mart_daily_org_balance
+    description: "Daily payments per org in USD with DoD % change vs last available day."
+    columns:
+      - name: ORGANIZATION_ID
+        data_tests: [not_null]
+      - name: DATE
+        data_tests: [not_null]
+      - name: DAILY_PAYMENT_AMOUNT
+        description: "USD payment amount for the day"
+        data_tests: [not_null]
+      - name: PREV_DAILY_PAYMENT_AMOUNT
+        description: "USD amount from the previous available day for the org (may be null)"
+      - name: DOD_CHANGE_PCT
+        description: "Percent change vs previous available day; null when no prior or prior equals zero"

@@ -1,0 +1,43 @@
+version: 2
+
+sources:
+  - name: raw
+    database: "{{ env_var('SNOWFLAKE_DATABASE') }}"
+    schema: "{{ env_var('SNOWFLAKE_SCHEMA_RAW') }}{{ env_var('SCHEMA_SUFFIX','') }}"
+    loader: "ingestion_script"
+    loaded_at_field: CREATED_AT
+    freshness:
+      warn_after: {count: 48, period: hour}
+      error_after: {count: 168, period: hour}
+
+    tables:
+      - name: organizations
+        identifier: ORGANIZATIONS
+        description: "Raw organizations snapshot loaded from CSV."
+        columns:
+          - name: ORGANIZATION_ID
+            data_tests: [not_null]
+          - name: FIRST_PAYMENT_DATE
+          - name: LAST_PAYMENT_DATE
+          - name: LEGAL_ENTITY_COUNTRY_CODE
+          - name: COUNT_TOTAL_CONTRACTS_ACTIVE
+          - name: CREATED_DATE
+
+      - name: invoices
+        identifier: INVOICES
+        description: "Raw invoices loaded from CSV."
+        columns:
+          - name: ORGANIZATION_ID
+            data_tests: [not_null]
+          - name: INVOICE_ID
+          - name: TRANSACTION_ID
+          - name: TYPE
+          - name: STATUS
+          - name: CURRENCY
+          - name: PAYMENT_CURRENCY
+          - name: PAYMENT_METHOD
+          - name: AMOUNT
+          - name: PAYMENT_AMOUNT
+          - name: FX_RATE
+          - name: FX_RATE_PAYMENT
+          - name: CREATED_AT

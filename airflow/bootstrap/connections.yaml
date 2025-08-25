@@ -1,0 +1,4 @@
+http_bin:
+  conn_type: http
+  host: https://httpbin.org
+  description: Sample HTTP service

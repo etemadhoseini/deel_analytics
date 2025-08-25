@@ -1,0 +1,53 @@
+version: 2
+
+models:
+  - name: stg_organizations
+    description: "Staging: organizations from RAW, typed & cleaned."
+    columns:
+      - name: ORGANIZATION_ID
+        data_type: number(38,0)
+        data_tests: [not_null, unique]
+      - name: FIRST_PAYMENT_DATE
+        data_type: date
+      - name: LAST_PAYMENT_DATE
+        data_type: date
+      - name: LEGAL_ENTITY_COUNTRY_CODE
+        data_type: varchar
+      - name: COUNT_TOTAL_CONTRACTS_ACTIVE
+        data_type: number(38,0)
+      - name: CREATED_DATE
+        data_type: date
+
+  - name: stg_invoices
+    description: "Staging: invoices from RAW, typed & cleaned."
+    columns:
+      - name: INVOICE_ID
+        data_type: varchar
+      - name: PARENT_INVOICE_ID
+        data_type: varchar
+      - name: TRANSACTION_ID
+        data_type: varchar
+      - name: ORGANIZATION_ID
+        data_type: number(38,0)
+      - name: TYPE
+        data_type: varchar
+      - name: STATUS
+        data_type: varchar
+      - name: CURRENCY
+        data_type: varchar
+      - name: PAYMENT_CURRENCY
+        data_type: varchar
+      - name: PAYMENT_METHOD
+        data_type: varchar
+      - name: AMOUNT
+        data_type: number(18,2)
+      - name: PAYMENT_AMOUNT
+        data_type: number(18,2)
+      - name: FX_RATE
+        data_type: number(18,6)
+      - name: FX_RATE_PAYMENT
+        data_type: number(18,6)
+      - name: CREATED_AT
+        data_type: timestamp_ntz
+      - name: CREATED_DATE
+        data_type: date

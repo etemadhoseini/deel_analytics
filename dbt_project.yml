@@ -1,0 +1,39 @@
+name: "deel_analytics"
+version: "1.0.0"
+config-version: 2
+
+profile: "deel_analytics"
+
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+test-paths: ["tests"]
+
+vars:
+  use_fx_normalization: "{{ env_var('DBT_USE_FX_NORMALIZATION', '1') }}"
+  alert_threshold_pct: "{{ env_var('ALERT_THRESHOLD_PCT', '0.5') }}"
+  alert_min_abs_delta: "{{ env_var('ALERT_MIN_ABSOLUTE_DELTA', '0') }}"
+
+models:
+  deel_analytics:
+    +materialized: view
+    +persist_docs:
+      relation: true
+      columns: true
+    +contract:
+      enforced: false
+    +query_tag: "{{ env_var('DBT_QUERY_TAG', 'deel_analytics') }}"
+    +database: "{{ env_var('SNOWFLAKE_DATABASE') }}"
+
+    curated:
+      +schema: "{{ env_var('SNOWFLAKE_SCHEMA_CURATED') }}{{ env_var('SCHEMA_SUFFIX','') }}"
+      +materialized: table
+
+    marts:
+      +schema: "{{ env_var('SNOWFLAKE_SCHEMA_MARTS') }}{{ env_var('SCHEMA_SUFFIX','') }}"
+      +materialized: table
+
+data_tests:
+  +database: "{{ env_var('SNOWFLAKE_DATABASE') }}"
+  +schema: "{{ env_var('SNOWFLAKE_SCHEMA_CURATED') }}{{ env_var('SCHEMA_SUFFIX','') }}"
+  +store_failures: false
